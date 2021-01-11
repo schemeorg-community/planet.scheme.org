@@ -1,4 +1,4 @@
 #!/bin/sh
 set -eu
 cd "$(dirname "$0")"
-rsync -vrx planet/ alpha.servers.scheme.org:/production/planet/planet/
+rsync -vrx --exclude '*~' planet/ alpha.servers.scheme.org:/production/planet/planet/
