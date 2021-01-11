@@ -1,18 +1,20 @@
 body {
-  border-right: 1px solid black;
-  margin-right: 200px;
-  padding-left: 20px;
+  padding-left: 1rem;
   padding-right: 20px;
+  font-family: sans-serif;
+  margin: 0em;
+  background-color: beige;
+}
+
+.daygroup {
+  max-width: calc(min(100%, 60rem) - 12rem);
 }
 
 h1 {
   margin-top: 0px;
-  padding-top: 20px;
-  font-family: "Bitstream Vera Sans", sans-serif;
   font-weight: normal;
   letter-spacing: -2px;
   text-transform: lowercase;
-  text-align: right;
   color: grey;
 }
 
@@ -21,17 +23,14 @@ h1 {
 }
 
 h2 {
-  font-family: "Bitstream Vera Sans", sans-serif;
-  font-weight: normal;
-  color: #200080;
-  margin-left: -20px;
+  margin-top: 1em;
+  margin-bottom: 0.3em;
+  color: darkred;
+  border-bottom: 1px solid red;
 }
 
 h3 {
-  font-family: "Bitstream Vera Sans", sans-serif;
-  font-weight: normal;
-  background-color: #a0c0ff;
-  border: 1px solid #5080b0;
+  color: darkred;
   padding: 4px;
 }
 
@@ -41,7 +40,6 @@ h3 a {
 }
 
 h4 {
-  font-family: "Bitstream Vera Sans", sans-serif;
   font-weight: bold;
 }
 
@@ -60,7 +58,6 @@ img.face {
 }
 
 .entry .date {
-  font-family: "Bitstream Vera Sans", sans-serif;
   color: grey;
 }
 
@@ -77,13 +74,12 @@ img.face {
   position: absolute;
   top: 0px;
   right: 0px;
-  width: 200px;
+  width: 12rem;
   margin-left: 0px;
   margin-right: 0px;
   padding-right: 0px;
   padding-top: 20px;
   padding-left: 0px;
-  font-family: "Bitstream Vera Sans", sans-serif;
   font-size: 85%;
 }
 
