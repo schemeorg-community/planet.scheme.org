@@ -4,8 +4,7 @@ cd "$(dirname "$0")"
 [ "$(id -un)" = prod-blog ] || { echo "Run me as prod-blog"; exit 1; }
 echo "Entering directory '$PWD'"
 set -x
-rm -rf www.new/
+rm -rf output/
 planet planet.ini "$@"
-rsync -vax static/ www.new/
-rsync -vax www.new/ ../www/
-rm -rf www.new/
+rsync -vax output/ static/ ../www/
+rm -rf output/

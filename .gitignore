@@ -1,2 +1,3 @@
 *.tmplc
-cache
+planet/cache
+planet/output
