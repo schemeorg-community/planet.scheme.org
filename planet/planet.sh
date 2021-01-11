@@ -6,5 +6,8 @@ echo "Entering directory '$PWD'"
 set -x
 rm -rf output
 planet planet.ini "$@"
+mkdir -p output/images/cache
+(cd output && gosh ../images.scm <index.html >index.html.new)
+mv -f output/index.html.new output/index.html
 rsync -vax output/ static/ ../www/
 rm -rf output
