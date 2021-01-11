@@ -1,5 +1,5 @@
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
-<html>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
 
 ### Fancy Planet HTML template.
 
@@ -13,9 +13,9 @@
 
 <head>
 <title><TMPL_VAR name></title>
-<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-<meta name="generator" content="<TMPL_VAR generator ESCAPE="HTML">">
-<link rel="stylesheet" href="planet.css" type="text/css">
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+<meta name="generator" content="<TMPL_VAR generator ESCAPE="HTML">"/>
+<link rel="stylesheet" href="planet.css" type="text/css"/>
 </head>
 
 <body>
@@ -48,7 +48,7 @@
 
 <h3><a href="<TMPL_VAR channel_link ESCAPE="HTML">" title="<TMPL_VAR channel_title ESCAPE="HTML">"><TMPL_VAR channel_name></a></h3>
 <TMPL_IF channel_face>
-<img class="face" src="images/<TMPL_VAR channel_face ESCAPE="HTML">" width="<TMPL_VAR channel_facewidth ESCAPE="HTML">" height="<TMPL_VAR channel_faceheight ESCAPE="HTML">" alt="">
+<img class="face" src="images/<TMPL_VAR channel_face ESCAPE="HTML">" width="<TMPL_VAR channel_facewidth ESCAPE="HTML">" height="<TMPL_VAR channel_faceheight ESCAPE="HTML">" alt=""/>
 </TMPL_IF>
 </TMPL_IF>
 
@@ -87,7 +87,7 @@
 <p><b>Planet Scheme</b> gathers blog posts from individuals and projects around the Scheme community in one place. It was previously maintained by Jens Axel Søgaard.</p>
 <p>To have your blog featured here, write to the <a href="https://srfi.schemers.org/srfi-list-subscribe.html#schemeorg"><code>schemeorg</code> mailing list</a>.</p>
 <p>Planet Scheme is a service of <a href="https://www.scheme.org/">Scheme.org</a>.</p>
-<p><img src="images/feed-icon-10x10.png" alt=""> <a href="/atom.xml">Atom feed</a></p>
+<p><img src="images/feed-icon-10x10.png" alt=""/> <a href="/atom.xml">Atom feed</a></p>
 <h2>Blogs</h2>
 <ul>
 <TMPL_LOOP Channels>
@@ -104,14 +104,14 @@
 </div>
 
 <p>
-<b>Last updated</b><br>
-<TMPL_VAR date><br>
-All times are UTC.<br>
+<b>Last updated</b><br/>
+<TMPL_VAR date><br/>
+All times are UTC.<br/>
 </p>
 
 <p>
-<b>Powered by</b><br>
-<a href="https://intertwingly.net/code/venus/docs/"><img src="images/planet.png" width="80" height="15" alt="Planet" border="0"></a>
+<b>Powered by</b><br/>
+<a href="https://intertwingly.net/code/venus/docs/"><img src="images/planet.png" width="80" height="15" alt="Planet" border="0"/></a>
 </p>
 
 </div>
