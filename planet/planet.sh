@@ -1,7 +1,7 @@
 #!/bin/sh
 set -eu
 cd "$(dirname "$0")"
-[ "$(id -un)" = prod-blog ] || { echo "Run me as prod-blog"; exit 1; }
+[ "$(id -un)" = prod-planet ] || { echo "Run me as prod-planet"; exit 1; }
 echo "Entering directory '$PWD'"
 set -x
 rm -rf output
