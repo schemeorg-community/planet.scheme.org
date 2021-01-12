@@ -76,15 +76,16 @@
 (let ((cache (load-cache))
       (html-string (port->string (current-input-port))))
   (write-string
-   (fold-right string-append ""
-               (map/odd (lambda (s odd?)
-                          (if odd?
-                              (let* ((uri s)
-                                     (pair (assoc uri cache))
-                                     (file (if pair (cdr pair) (download uri))))
-                                (unless (or pair (string=? "" file))
-                                  (set! cache (cons (cons uri file) cache)))
-                                file)
-                              s))
-                        (regexp-partition uri-regexp html-string))))
+   (fold-right
+    string-append ""
+    (map/odd (lambda (s odd?)
+               (if odd?
+                   (let* ((uri s)
+                          (pair (assoc uri cache))
+                          (file (if pair (cdr pair) (download uri))))
+                     (unless (or pair (string=? "" file))
+                       (set! cache (cons (cons uri file) cache)))
+                     file)
+                   s))
+             (regexp-partition uri-regexp html-string))))
   (save-cache cache))
