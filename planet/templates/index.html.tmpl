@@ -83,37 +83,34 @@
 </TMPL_LOOP>
 
 <div class="sidebar">
+
 <h2>About</h2>
 <p><b>Planet Scheme</b> gathers blog posts from individuals and projects around the Scheme community in one place. It was previously maintained by Jens Axel Søgaard.</p>
 <p>To have your blog featured here, write to the <a href="https://srfi.schemers.org/srfi-list-subscribe.html#schemeorg"><code>schemeorg</code> mailing list</a>.</p>
 <p>Planet Scheme is a service of <a href="https://www.scheme.org/">Scheme.org</a>.</p>
 <p><img src="images/feed-icon-10x10.png" alt=""/> <a href="/atom.xml">Atom feed</a></p>
-<h2>Blogs</h2>
+
+<h2>Planetarium</h2>
 <ul>
 <TMPL_LOOP Channels>
 <li><a href="<TMPL_VAR link ESCAPE="HTML">" title="<TMPL_VAR title ESCAPE="HTML">"><TMPL_VAR name></a> <a href="<TMPL_VAR url ESCAPE="HTML">">(feed)</a></li>
 </TMPL_LOOP>
 </ul>
 
-<div>
-<p><b>See Also</b></p>
+<h2>Planetarium</h2>
 <ul>
 <li><a href="http://planet.clojure.in/">Planet Clojure</a></li>
 <li><a href="https://planet.lisp.org/">Planet Lisp</a></li>
 <li><a href="https://racket-stories.com/">Racket Stories</a></li>
 </ul>
-</div>
 
-<p>
-<b>Last updated</b><br/>
-<TMPL_VAR date><br/>
-</p>
+<h2>Last updated</h2>
+<p><TMPL_VAR date></p>
 
-<p>
-<b>Powered by</b><br/>
-<a href="https://intertwingly.net/code/venus/docs/"><img src="images/planet.png" width="80" height="15" alt="Planet" border="0"/></a>
-</p>
+<h2>Powered by</h2>
+<p><a href="https://intertwingly.net/code/venus/docs/"><img src="images/planet.png" width="80" height="15" alt="Planet" border="0"/></a></p>
 
 </div>
+
 </body>
 </html>
