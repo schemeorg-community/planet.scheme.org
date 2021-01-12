@@ -1,6 +1,6 @@
 (import (scheme base) (scheme char) (scheme file)
         (scheme read) (scheme write))
-(import (srfi 1) (srfi 115) (srfi 193))
+(import (srfi 13) (srfi 115) (srfi 193))
 (cond-expand
   (gauche (import (rfc http) (rfc sha) (rfc uri))
           (import (only (gauche base)
@@ -76,8 +76,7 @@
 (let ((cache (load-cache))
       (html-string (port->string (current-input-port))))
   (write-string
-   (fold-right
-    string-append ""
+   (string-concatenate
     (map/odd (lambda (s odd?)
                (if odd?
                    (let* ((uri s)
