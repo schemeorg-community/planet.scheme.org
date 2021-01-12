@@ -1,11 +1,13 @@
-(import (scheme base) (scheme char) (scheme file) (scheme write))
-(import (srfi 1) (srfi 115))
+(import (scheme base) (scheme char) (scheme file)
+        (scheme read) (scheme write))
+(import (srfi 1) (srfi 115) (srfi 193))
 (cond-expand
   (gauche (import (rfc http) (rfc sha) (rfc uri))
           (import (only (gauche base)
                         make
                         make-keyword
                         port->string
+                        pprint
                         sys-basename))
           (import (only (file util)
                         path-extension))))
@@ -30,7 +32,7 @@
             (begin (digest-update! digest bytes)
                    (loop)))))))
 
-(define url-regexp
+(define uri-regexp
   '(: "http" (? "s") "://"
       (+ (- graphic "\""))
       "." (or "jpeg" "jpg" "png" "svg")))
@@ -62,8 +64,27 @@
                       (lambda (out) (write-bytevector bytes out)))
       sha-ext)))
 
-(let ((html-string (port->string (current-input-port))))
+(define cache-file (string-append (script-directory) "images-cache.scm"))
+
+(define (load-cache)
+  (if (file-exists? cache-file) (with-input-from-file cache-file read)
+      '()))
+
+(define (save-cache cache)
+  (with-output-to-file cache-file (lambda () (pprint cache))))
+
+(let ((cache (load-cache))
+      (html-string (port->string (current-input-port))))
   (write-string
    (fold-right string-append ""
-               (map/odd (lambda (s odd?) (if odd? (download s) s))
-                        (regexp-partition url-regexp html-string)))))
+               (map/odd (lambda (s odd?)
+                          (if odd?
+                              (let* ((uri s)
+                                     (pair (assoc uri cache))
+                                     (file (if pair (cdr pair) (download uri))))
+                                (unless (or pair (string=? "" file))
+                                  (set! cache (cons (cons uri file) cache)))
+                                file)
+                              s))
+                        (regexp-partition uri-regexp html-string))))
+  (save-cache cache))
