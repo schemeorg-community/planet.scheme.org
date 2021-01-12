@@ -53,7 +53,8 @@
     (let* ((bytes (download-http-uri-as-bytevector uri))
            (sha (call-with-port (open-input-bytevector bytes) sha1))
            (orig-ext (path-extension (sys-basename (uri-ref uri 'path))))
-           (ext (if (equal? orig-ext "jpg") "jpeg" orig-ext))
+           (ext (string-downcase
+                 (if (string=? orig-ext "jpg") "jpeg" orig-ext)))
            (sha-ext (string-append "images/cache/" sha "." ext)))
       (edisp "Saving into " sha-ext)
       (call-with-port (open-binary-output-file sha-ext)
