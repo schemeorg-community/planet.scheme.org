@@ -39,12 +39,13 @@
   (call-with-port
    (open-output-bytevector)
    (lambda (out)
-     (http-get (uri-ref uri 'host+port)
-               (uri-ref uri 'path+query)
-               (make-keyword 'secure)  (string-ci=? "https"
-                                                    (uri-ref uri 'scheme))
-               (make-keyword 'sink)    out
-               (make-keyword 'flusher) (lambda _ #t))
+     (parameterize ((http-user-agent "https://planet.scheme.org/ images"))
+       (http-get (uri-ref uri 'host+port)
+                 (uri-ref uri 'path+query)
+                 (make-keyword 'secure)  (string-ci=? "https"
+                                                      (uri-ref uri 'scheme))
+                 (make-keyword 'sink)    out
+                 (make-keyword 'flusher) (lambda _ #t)))
      (get-output-bytevector out))))
 
 (define (download uri)
