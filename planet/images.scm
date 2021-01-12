@@ -31,7 +31,9 @@
                    (loop)))))))
 
 (define url-regexp
-  '(: "http" (? "s") "://" (+ (- graphic "\"")) "." (or "jpeg" "jpg" "png")))
+  '(: "http" (? "s") "://"
+      (+ (- graphic "\""))
+      "." (or "jpeg" "jpg" "png" "svg")))
 
 (define (download-http-uri-as-bytevector uri)
   (call-with-port
