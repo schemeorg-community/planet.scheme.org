@@ -67,8 +67,8 @@
 (define cache-file (string-append (script-directory) "images-cache.scm"))
 
 (define (load-cache)
-  (if (file-exists? cache-file) (with-input-from-file cache-file read)
-      '()))
+  (guard (err (else '()))
+    (with-input-from-file cache-file read)))
 
 (define (save-cache cache)
   (with-output-to-file cache-file (lambda () (pprint cache))))
