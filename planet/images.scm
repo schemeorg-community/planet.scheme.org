@@ -68,7 +68,8 @@
 
 (define (load-cache)
   (guard (err (else '()))
-    (with-input-from-file cache-file read)))
+    (let ((list (with-input-from-file cache-file read)))
+      (if (list? list) list '()))))
 
 (define (save-cache cache)
   (with-output-to-file cache-file (lambda () (pprint cache))))
