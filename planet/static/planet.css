@@ -1,13 +1,28 @@
 body {
+  background-color: white;
   padding-left: 1rem;
   padding-right: 20px;
   font-family: sans-serif;
   margin: 0em;
-  background-color: beige;
 }
 
-.daygroup {
+.channelgroup > h3 {
+  background-color: beige;
+  border-radius: 0.5rem;
+  font-size: 150%;
+  margin-bottom: 0;
+  padding: 1rem;
+}
+
+.channelgroup,
+.daygroup > h2 {
   max-width: calc(min(100%, 60rem) - 12rem);
+}
+
+.entrygroup {
+  background-color: beige;
+  border-radius: 0.5rem;
+  padding: 1rem;
 }
 
 h1 {
