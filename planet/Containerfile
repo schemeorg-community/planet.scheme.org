@@ -23,12 +23,15 @@ workdir /build/gauche
 run ./configure --with-tls=mbedtls
 run make
 run make install
+copy images.scm planet-container.sh planet.ini /planet/
+copy static /planet/static
+copy templates /planet/templates
 
 from debian:buster-slim
 run apt-get update && apt-get -qq install \
       ca-certificates libgc1c2 libmbedtls12 planet-venus rsync \
  && rm -rf /var/lib/apt/lists/*
 copy --from=build /usr/local/ /usr/local/
-workdir /planet/
-add . /planet/
+copy --from=build /planet/ /planet/
+workdir /planet
 cmd ["./planet-container.sh"]
