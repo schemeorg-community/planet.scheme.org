@@ -1,4 +1,4 @@
 *~
-planet/cache
-planet/output
-planet/templates/*.tmplc
+/cache
+/output
+/templates/*.tmplc
