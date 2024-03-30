@@ -2,14 +2,21 @@
 
 * How to update Planet Scheme
 
-- SSH to [[https://planet.scheme.org/][planet.scheme.org]].
-- Make sure that it's up to date with the repo.
-- Execute:
+- Make your change to the Planet Scheme git repo at
+  ~git@github.com:schemeorg/planet.scheme.org.git~.
+
+- Make sure that the Planet Scheme server is up to date with the repo:
 
   #+begin_src sh
+  ./upload.sh
+  #+end_src
+
+- Execute these commands on [[https://planet.scheme.org/][planet.scheme.org]]:
+
+  #+begin_src sh :dir /ssh:planet.scheme.org: :results output silent :session planet.scheme.org
   cd /production/planet/
   sudo docker build --file=Containerfile .
-  docker image tag ee135f567403 prod-planet
+  docker image tag $(docker images --format "{{.ID}}" --no-trunc | head -n 1) prod-planet
   docker run --rm --interactive prod-planet>/tmp/planet.tar
   sudo -u prod-planet tar xvf /tmp/planet.tar
   #+end_src
