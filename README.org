@@ -5,7 +5,8 @@
 - Make your change to the Planet Scheme git repo at
   ~git@github.com:schemeorg/planet.scheme.org.git~.
 
-- Make sure that the Planet Scheme server is up to date with the repo:
+- Make sure that the Planet Scheme server is up to date with the
+  repo, run this command locally:
 
   #+begin_src sh
   ./upload.sh
