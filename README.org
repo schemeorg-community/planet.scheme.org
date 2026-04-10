@@ -12,6 +12,13 @@
   ./upload.sh
   #+end_src
 
+- If you get file permission errors, run this on
+  ~tuonela.scheme.org/~, then run ~upload.sh~ again:
+
+  #+begin_src sh
+  chmod g+w /production/planet/ /production/planet/planet.ini
+  #+end_src
+
 - Execute these commands on [[https://planet.scheme.org/][planet.scheme.org]]:
 
   #+begin_src sh :dir /ssh:planet.scheme.org: :results output silent :session planet.scheme.org
