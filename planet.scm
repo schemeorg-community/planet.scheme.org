@@ -78,7 +78,10 @@
   (if date
       (let ((s (date->string date "~Y-~m-~dT~H:~M:~S~z")))
         ;; SRFI 19 ~z produces e.g. "-0700", but RFC 3339 requires "-07:00".
-        (regexp-replace #/([+-]\d{2})(\d{2})$/ s "\\1:\\2"))
+        (regexp-replace #/([+-]\d{2})(\d{2})$/ s
+                        (lambda (m)
+                          (string-append (rxmatch-substring m 1) ":"
+                                         (rxmatch-substring m 2)))))
       ""))
 
 ;; Convert strftime-style format (%A, %B, %d, etc.) to SRFI 19 (~A, ~B, ~d).
