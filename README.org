@@ -50,18 +50,17 @@ Edit [[file:config.scm][config.scm]] and add a ~feed~ entry:
   chmod g+w /production/planet/ /production/planet/config.scm
   #+end_src
 
-- Execute these commands on [[https://planet.scheme.org/][planet.scheme.org]]:
+- Build the Docker image on [[https://planet.scheme.org/][planet.scheme.org]]:
 
   #+begin_src sh :dir /ssh:planet.scheme.org: :results output silent :session planet.scheme.org
   cd /production/planet/
-  sudo docker build --file=Containerfile .
-  docker image tag $(docker images --format "{{.ID}}" --no-trunc | head -n 1) prod-planet
+  make docker-build
   #+end_src
 
 * Fetch feeds and generate new page
 
-  #+begin_src sh
+  #+begin_src sh :dir /ssh:planet.scheme.org: :results output silent :session planet.scheme.org
   cd /production/planet/
-  docker run --rm --interactive prod-planet>/tmp/planet.tar
-  sudo -u prod-planet tar xvf /tmp/planet.tar
+  make docker-build
+  make docker-deploy
   #+end_src
