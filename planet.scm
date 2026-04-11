@@ -518,6 +518,8 @@
         (ul (li (a (@ (href "http://planet.clojure.in/")) "Planet Clojure"))
             (li (a (@ (href "https://planet.lisp.org/")) "Planet Lisp"))
             (li (a (@ (href "https://racket-stories.com/")) "Racket Stories")))
+        (h2 "Source code")
+        (p (a (@ (href "https://github.com/schemeorg-community/planet.scheme.org")) "Github"))
         (h2 "Last updated")
         (p ,(html-escape (date->display now date-format)))))
 
