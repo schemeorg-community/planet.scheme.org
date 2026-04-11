@@ -23,6 +23,12 @@ body {
   background-color: beige;
   border-radius: 0.5rem;
   padding: 1rem;
+  overflow: hidden;
+}
+
+.entrygroup img {
+  max-width: 100%;
+  height: auto;
 }
 
 h1 {

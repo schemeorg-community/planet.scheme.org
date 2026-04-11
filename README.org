@@ -1,12 +1,43 @@
 #+TITLE: Planet Scheme
 
-* How to update Planet Scheme
+* Overview
+
+Planet Scheme is a feed aggregator for the Scheme community,
+written in [[https://practical-scheme.net/gauche/][Gauche Scheme]].  It fetches RSS and Atom feeds listed in
+~config.scm~, merges and sorts the entries, and generates
+~index.html~, ~atom.xml~, and ~rss20.xml~.
+
+* Local development
+
+Fetch feeds and generate output:
+
+#+begin_src sh
+make fetch
+#+end_src
+
+Copy static files and serve locally:
+
+#+begin_src sh
+make serve
+#+end_src
+
+Then visit http://localhost:8080/.
+
+* Adding or updating a feed
+
+Edit ~config.scm~ and add a ~feed~ entry:
+
+#+begin_src scheme
+(feed (url "https://example.com/feed.xml")
+      (name "Author Name"))
+#+end_src
+
+* How to deploy
 
 - Make your change to the Planet Scheme git repo at
   ~git@github.com:schemeorg/planet.scheme.org.git~.
 
-- Make sure that the Planet Scheme server is up to date with the
-  repo, run this command locally:
+- Upload to the server:
 
   #+begin_src sh
   ./upload.sh
@@ -16,7 +47,7 @@
   ~tuonela.scheme.org/~, then run ~upload.sh~ again:
 
   #+begin_src sh
-  chmod g+w /production/planet/ /production/planet/planet.ini
+  chmod g+w /production/planet/ /production/planet/config.scm
   #+end_src
 
 - Execute these commands on [[https://planet.scheme.org/][planet.scheme.org]]:

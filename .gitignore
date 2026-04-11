@@ -1,4 +1,5 @@
 *~
 /cache
+/images-cache.scm
 /output
 /templates/*.tmplc
