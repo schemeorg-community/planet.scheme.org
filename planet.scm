@@ -481,7 +481,10 @@
                  channel-groups))))
 
 (define (sidebar-sxml feeds channel-links date-format now)
-  `(div (@ (class "sidebar"))
+  `(div (@ (class "sidebar") (id "sidebar") (popover ""))
+        (button (@ (class "close") (popovertarget "sidebar")
+                   (aria-label "Close menu"))
+                ,(string #\x00d7))
         (h2 "About")
         (p (b "Planet Scheme")
            " collects blog posts from individuals"
@@ -526,6 +529,8 @@
     (head
      (title ,(html-escape planet-name))
      (meta (@ (charset "utf-8")))
+     (meta (@ (name "viewport")
+              (content "width=device-width, initial-scale=1")))
      (meta (@ (name "generator")
               (content "Planet Scheme (Gauche)")))
      (link (@ (href "planet.css") (rel "stylesheet") (type "text/css")))
@@ -540,7 +545,11 @@
 	      (sizes "any")
 	      (type "image/svg+xml"))))
     (body
-     (h1 ,(html-escape planet-name))
+     (div (@ (class "topbar"))
+          (h1 ,(html-escape planet-name))
+          (button (@ (class "hamburger") (popovertarget "sidebar")
+                     (aria-label "Open menu"))
+                  ,(string #\x2630)))
      ,@day-groups
      ,sidebar)))
 
