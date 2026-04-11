@@ -55,7 +55,12 @@
 
 (define (parse-date string)
   (and (string? string)
-       (let ((s (string-trim-both string)))
+       (let* ((s (string-trim-both string))
+              ;; RFC 3339 uses e.g. "+02:00" but SRFI 19 ~z expects "+0200".
+              (s (regexp-replace #/([+-]\d{2}):(\d{2})$/ s
+                   (lambda (m)
+                     (string-append (rxmatch-substring m 1)
+                                    (rxmatch-substring m 2))))))
          (let loop ((formats date-formats))
            (and (not (null? formats))
 		(guard (_ (else (loop (cdr formats))))
