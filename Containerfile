@@ -6,9 +6,9 @@ run apt-get update && apt-get -qq install \
       make netbase pkg-config zlib1g-dev \
  && rm -rf /var/lib/apt/lists/*
 workdir /build
-copy checksum checksum
+copy gauche-checksum gauche-checksum
 add https://files.scheme.org/Gauche-0.9.10.tgz gauche.tgz
-run sha256sum -c checksum
+run sha256sum -c gauche-checksum
 run mkdir gauche && tar -C gauche --strip-components 1 -xf gauche.tgz
 workdir /build/gauche
 run ./configure --with-tls=mbedtls
