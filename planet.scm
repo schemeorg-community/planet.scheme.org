@@ -263,6 +263,15 @@
                               (car children))
                              (else (find (cdr children)))))))
                 (and link-node (sxml:attr link-node 'href)))
+              (and feed
+                   (let find ((children (cdr feed)))
+                     (cond ((null? children) #false)
+                           ((and (pair? (car children))
+                                 (eq? (caar children) 'atom:link)
+                                 (equal? (sxml:attr (car children) 'rel)
+                                         "self"))
+                            (sxml:attr (car children) 'href))
+                           (else (find (cdr children))))))
               ""))
          (entries (if feed (sxml-find-all feed 'atom:entry) '())))
     (filter-map
