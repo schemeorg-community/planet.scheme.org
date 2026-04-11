@@ -76,7 +76,9 @@
 
 (define (date->rfc822 date)
   (if date
-      (date->string date "~a, ~d ~b ~Y ~H:~M:~S ~z")
+      (let ((s (date->string date "~a, ~d ~b ~Y ~H:~M:~S ~z")))
+        ;; Gauche's ~z outputs "Z" for UTC, but RFC 2822 requires "+0000".
+        (regexp-replace #/ Z$/ s " +0000"))
       ""))
 
 (define (date->iso8601 date)
