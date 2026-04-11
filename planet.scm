@@ -144,20 +144,9 @@
                                (xhtml . "http://www.w3.org/1999/xhtml")))))))
 
 (define (sxml-text node)
-  (define (collect node)
-    (cond ((string? node) (list node))
-          ((pair? node)
-           (append-map collect
-                       (if (and (pair? node) (symbol? (car node)))
-                           (cdr node) node)))
-          (else '())))
-  (cond ((not node) #false)
-        ((string? node) node)
-        ((pair? node)
-         (let ((texts (collect node)))
-           (and (not (null? texts))
-		(string-concatenate texts))))
-        (else #false)))
+  (and node
+       (let ((s (sxml:string-value node)))
+         (and (not (string-null? s)) s))))
 
 ;; Get the first match using an SXPath-like manual accessor.
 (define (sxml-find sxml . path)
