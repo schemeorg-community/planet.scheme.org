@@ -223,6 +223,8 @@ a:hover {
     box-shadow: 0 4px 16px rgb(0 0 0 / 15%);
     font-size: inherit;
     inset: 0.5rem 0.5rem auto auto;
+    max-height: calc(100vh - 1rem);
+    overflow-y: auto;
   }
 
   .sidebar button.close {
