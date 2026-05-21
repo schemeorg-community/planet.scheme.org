@@ -99,6 +99,8 @@
         (name "Tim van der Linden"))
   (feed (url "https://emacsninja.com/scheme.atom")
         (name "Vasilij Schneidermann"))
+  (feed (url "https://r7rs.org/feed.xml")
+	(name "Updates from the R7RS standards process"))
   (feed (url "https://lockywolf.wordpress.com/tag/scheme/feed/")
         (name "Vladimir Nikishkin"))
   (feed (url "https://wmfarr.blogspot.com/atom.xml")
