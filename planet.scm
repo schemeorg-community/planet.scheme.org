@@ -53,14 +53,33 @@
     "~Y-~m-~d ~H:~M:~S"
     "~Y-~m-~d"))
 
+;; Named timezone abbreviations to numeric UTC offsets for SRFI 19 ~z.
+(define named-timezones
+  '(("EST" . "-0500") ("EDT" . "-0400")
+    ("CST" . "-0600") ("CDT" . "-0500")
+    ("MST" . "-0700") ("MDT" . "-0600")
+    ("PST" . "-0800") ("PDT" . "-0700")
+    ("UT"  . "+0000") ("UTC" . "+0000")))
+
 (define (parse-date string)
   (and (string? string)
        (let* ((s (string-trim-both string))
               ;; RFC 3339 uses e.g. "+02:00" but SRFI 19 ~z expects "+0200".
               (s (regexp-replace #/([+-]\d{2}):(\d{2})$/ s
-                   (lambda (m)
-                     (string-append (rxmatch-substring m 1)
-                                    (rxmatch-substring m 2))))))
+				 (lambda (m)
+				   (string-append (rxmatch-substring m 1)
+						  (rxmatch-substring m 2)))))
+              ;; Convert named timezones (e.g. "EST") to numeric offsets.
+              (s (let ((pair (find (lambda (p)
+                                     (string-suffix? (car p) s))
+                                   named-timezones)))
+                   (if pair
+                       (string-append
+                        (string-trim-right
+                         (string-drop-right s (string-length (car pair))))
+                        " "
+			(cdr pair))
+                       s))))
          (let loop ((formats date-formats))
            (and (not (null? formats))
 		(guard (_ (else (loop (cdr formats))))
