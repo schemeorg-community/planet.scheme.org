@@ -19,8 +19,6 @@
         (name "Andy Wingo"))
   (feed (url "https://speechcode.com/blog/label/scheme/rss")
         (name "Arthur A. Gleckler"))
-  (feed (url "http://feeds.feedburner.com/bendiken/lisp")
-        (name "Arto Bendiken"))
   (feed (url "https://www.blogbyben.com/feeds/posts/default/-/scheme")
         (name "Ben Simon"))
   (feed (url "https://gazette.call-cc.org/feed.atom")
