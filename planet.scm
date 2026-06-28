@@ -565,7 +565,7 @@
                                           (cdr node))))
                       new-cache)
               (values #false new-cache)))
-        (values node cache))))
+        (values (and src node) cache))))
 
 (define (cache-images-in-sxml nodes cache output-dir)
   (let loop ((nodes nodes) (cache cache) (acc '()))
