@@ -5,6 +5,6 @@ cd "$(dirname "$0")"
 echo "Entering directory '$PWD'"
 set -x
 rm -rf output
-gosh planet.scm "$@"
+gosh -I. planet.scm "$@"
 rsync -vax output/ static/ ../www/
 rm -rf output

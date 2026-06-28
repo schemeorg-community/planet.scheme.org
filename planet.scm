@@ -1,6 +1,7 @@
 #!/usr/bin/env gosh
 ;; Planet Scheme — feed aggregator in Gauche Scheme
 
+(use chibi.html-parser)
 (use file.util)
 (use gauche.parameter)
 (use gauche.sequence)
@@ -224,8 +225,11 @@
                                   (cdr rest) rest))
                     (attr-str (string-concatenate
                                (map (lambda (a)
-                                      (format " ~a=\"~a\""
-                                              (car a) (html-escape (cadr a))))
+                                      (if (pair? (cdr a))
+                                          (format " ~a=\"~a\""
+                                                  (car a)
+						  (html-escape (cadr a)))
+                                          (format " ~a" (car a))))
                                     attributes)))
                     (recurse (lambda (n)
                                (sxml->string n escape-text tag-name))))
@@ -246,7 +250,24 @@
 (define (sxml->xml-string node)
   (sxml->string node html-escape symbol->string))
 
-;; Make an entry record.
+(define (html-string->sxml s)
+  (let ((doc (html->sxml s)))
+    (if (and (pair? doc) (eq? (car doc) '*TOP*))
+        (cdr doc)
+        (list doc))))
+
+(define (content-sxml node)
+  (if (not node)
+      '()
+      (let ((children (filter (lambda (x)
+                                (not (and (pair? x) (eq? (car x) '@))))
+                              (cdr node))))
+        (if (and (pair? children)
+                 (null? (cdr children))
+                 (string? (car children)))
+            (html-string->sxml (car children))
+            children))))
+
 (define (make-entry title link content author date-str channel-name channel-link
                     feed-url)
   (let ((parsed-date (parse-date/loose date-str)))
@@ -304,15 +325,10 @@
          (let ((content (if content-node
                             (let ((type (sxml:attr content-node 'type)))
                               (if (and type (string-contains type "html"))
-                                  (string-concatenate
-                                   (map sxml->html-string
-                                        (filter (lambda (x)
-                                                  (not (and (pair? x)
-							    (eq? (car x) '@))))
-                                                (cdr content-node))))
-                                  (html-escape (or (sxml-text content-node)
-						   ""))))
-                            "")))
+                                  (content-sxml content-node)
+                                  (list (html-escape
+                                         (or (sxml-text content-node) "")))))
+                            '())))
            (make-entry (or title "")
 		       (or link "")
 		       content
@@ -331,15 +347,15 @@
      (lambda (item)
        (let ((title (sxml-text-at item 'title))
              (link (sxml-text-at item 'link))
-             (content (or (sxml-text-at item 'content:encoded)
-                          (sxml-text-at item 'description)))
+             (content (content-sxml (or (sxml-find item 'content:encoded)
+					(sxml-find item 'description))))
              (author (or (sxml-text-at item 'dc:creator)
                          (sxml-text-at item 'author)))
              (date (or (sxml-text-at item 'pubDate)
                        (sxml-text-at item 'dc:date))))
          (make-entry (or title "")
 		     (or link "")
-		     (or content "")
+		     content
                      (or author "")
 		     (or date "")
                      channel-name
@@ -356,13 +372,13 @@
      (lambda (item)
        (let ((title (sxml-text-at item 'rss1:title))
              (link (sxml-text-at item 'rss1:link))
-             (content (or (sxml-text-at item 'content:encoded)
-                          (sxml-text-at item 'rss1:description)))
+             (content (content-sxml (or (sxml-find item 'content:encoded)
+                                        (sxml-find item 'rss1:description))))
              (author (sxml-text-at item 'dc:creator))
              (date (sxml-text-at item 'dc:date)))
          (make-entry (or title "")
 		     (or link "")
-		     (or content "")
+		     content
                      (or author "")
 		     (or date "")
                      channel-name
@@ -394,7 +410,7 @@
 
 (define (download-image uri output-dir)
   (format (current-error-port) "Downloading image ~a~%" uri)
-  (guard (_ (else ""))
+  (guard (_ (else #false))
     (let-values (((scheme user host port path query fragment)
                   (uri-parse uri)))
       (let* ((secure (and scheme (string-ci=? scheme "https")))
@@ -420,32 +436,71 @@
                              (lambda (out) (write-bytevector bytes out)))
              relpath)))))))
 
-(define (cache-images-in-html html-string image-cache output-dir)
-  (let loop ((parts (regexp-partition image-uri-regexp html-string))
-             (odd? #false)
-             (cache image-cache)
-             (accumulator '()))
-    (if (null? parts)
-        (values (string-concatenate (reverse accumulator)) cache)
-        (let ((s (car parts)))
-          (if odd?
-              (let* ((pair (assoc s cache))
-                     (file (if pair
-			       (cdr pair)
-                               (download-image s output-dir)))
-                     (new-cache (if (or pair (string=? "" file))
-                                    cache
-                                    (cons (cons s file) cache))))
-                (loop (cdr parts) #false new-cache (cons file accumulator)))
-              (loop (cdr parts) #true cache (cons s accumulator)))))))
+(define (cache-image-url url cache output-dir)
+  (let ((pair (assoc url cache)))
+    (if pair
+        (values (cdr pair) cache)
+        (let ((file (download-image url output-dir)))
+          (if file
+              (values file (cons (cons url file) cache))
+              (values #false cache))))))
+
+(define (cache-img-element node cache output-dir)
+  (let ((src (sxml:attr node 'src)))
+    (if (and src (rxmatch (regexp image-uri-regexp) src))
+        (let-values (((local-src new-cache)
+                      (cache-image-url src cache output-dir)))
+          (if local-src
+              (values (cons (car node)
+                            (cons (cons '@ (map (lambda (a)
+                                                  (if (eq? (car a) 'src)
+                                                      (list 'src local-src)
+                                                      a))
+                                                (or (sxml:attr-list node) '())))
+                                  (filter (lambda (x)
+                                            (not (and (pair? x) (eq? (car x) '@))))
+                                          (cdr node))))
+                      new-cache)
+              (values #false new-cache)))
+        (values node cache))))
+
+(define (cache-images-in-sxml nodes cache output-dir)
+  (let loop ((nodes nodes) (cache cache) (acc '()))
+    (if (null? nodes)
+        (values (reverse acc) cache)
+        (let ((node (car nodes)))
+          (cond
+           ((string? node)
+            (loop (cdr nodes) cache (cons node acc)))
+           ((and (pair? node) (eq? (car node) 'img))
+            (let-values (((new-img new-cache)
+                          (cache-img-element node cache output-dir)))
+              (if new-img
+                  (loop (cdr nodes) new-cache (cons new-img acc))
+                  (loop (cdr nodes) new-cache acc))))
+           ((pair? node)
+            (let* ((tag (car node))
+                   (rest (cdr node))
+                   (attrs (if (and (pair? rest) (pair? (car rest))
+                                   (eq? (caar rest) '@))
+                              (car rest) #false))
+                   (children (if attrs (cdr rest) rest)))
+              (let-values (((new-children new-cache)
+                            (cache-images-in-sxml children cache output-dir)))
+                (let ((new-node (if attrs
+                                    (cons tag (cons attrs new-children))
+                                    (cons tag new-children))))
+                  (loop (cdr nodes) new-cache (cons new-node acc))))))
+           (else
+            (loop (cdr nodes) cache (cons node acc))))))))
 
 (define (cache-all-images entries image-cache output-dir)
   (let loop ((entries entries) (cache image-cache) (accumulator '()))
     (if (null? entries)
         (values (reverse accumulator) cache)
         (let-values (((cached-content new-cache)
-                      (cache-images-in-html
-                       (or (entry-ref (car entries) 'content) "")
+                      (cache-images-in-sxml
+                       (or (entry-ref (car entries) 'content) '())
                        cache output-dir)))
           (loop (cdr entries) new-cache
                 (cons (cons cached-content (car entries)) accumulator))))))
@@ -462,7 +517,7 @@
                 `((h4 (a (@ (href ,link)) ,title)))
                 '())
           (div (@ (class "entry"))
-               (div ,cached-content)
+               (div ,@cached-content)
                (p (@ (class "date"))
                   (a (@ (href ,link))
                      ,@(if (and author (not (string=? author "")))
@@ -629,7 +684,7 @@
             ,@(map
                (lambda (entry)
                  (let ((link (or (entry-ref entry 'link) ""))
-                       (content (or (entry-ref entry 'content) ""))
+                       (content (or (entry-ref entry 'content) '()))
                        (author (or (entry-ref entry 'author) "")))
                    `(entry
                      (title ,(entry-title-string entry))
@@ -639,7 +694,9 @@
                      ,@(if (string=? author "")
                            '()
                            `((author (name ,author))))
-                     (content (@ (type "html")) ,content)
+                     (content (@ (type "html"))
+                              ,(string-concatenate
+                                (map sxml->html-string content)))
                      (source (title ,(or (entry-ref entry 'channel-name) ""))))))
                entries)))))
 
@@ -661,14 +718,16 @@
             ,@(map
                (lambda (entry)
                  (let ((link (or (entry-ref entry 'link) ""))
-                       (content (or (entry-ref entry 'content) "")))
+                       (content (or (entry-ref entry 'content) '())))
                    `(item
                      (title ,(entry-title-string entry))
                      (guid (@ (isPermaLink "true")) ,link)
                      (link ,link)
-                     ,@(if (string=? content "")
+                     ,@(if (null? content)
                            '()
-                           `((description ,content)))
+                           `((description
+                              ,(string-concatenate
+                                (map sxml->html-string content)))))
                      (pubDate ,(date->rfc822 (entry-ref entry 'date))))))
                entries))))))
 

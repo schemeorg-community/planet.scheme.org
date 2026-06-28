@@ -17,7 +17,7 @@ docker-deploy:
 	sudo -u prod-planet tar xvf /tmp/planet.tar
 
 fetch:
-	gosh planet.scm
+	gosh -I. planet.scm
 
 serve: build
 	gosh serve.scm 8080 output

@@ -15,6 +15,7 @@ run ./configure --with-tls=mbedtls
 run make
 run make install
 copy planet.scm planet-container.sh config.scm /planet/
+copy chibi /planet/chibi
 copy static /planet/static
 
 from debian:bookworm-slim
