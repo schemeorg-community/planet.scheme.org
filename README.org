@@ -32,6 +32,15 @@ Edit [[file:config.scm][config.scm]] and add a ~feed~ entry:
       (name "Author Name"))
 #+end_src
 
+* Cron
+
+A ~cron~ job for updating the page is defined at
+~/etc/cron.d/scheme-prod-planet~:
+
+#+begin_src cron
+0 0-23/6 * * * prod-planet /production/planet/cron.sh
+#+end_src
+
 * Deploy
 
 - Make your change to the Planet Scheme git repo at
