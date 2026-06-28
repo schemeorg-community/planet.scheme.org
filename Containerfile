@@ -1,6 +1,6 @@
 # Build Gauche from source for the feed aggregator.
 
-from debian:bookworm-slim as build
+from debian:trixie-slim as build
 run apt-get update && apt-get -qq install \
       ca-certificates file gcc libc-dev libgc-dev libmbedtls-dev \
       make netbase pkg-config zlib1g-dev \
@@ -18,9 +18,9 @@ copy planet.scm planet-container.sh config.scm /planet/
 copy chibi /planet/chibi
 copy static /planet/static
 
-from debian:bookworm-slim
+from debian:trixie-slim
 run apt-get update && apt-get -qq install \
-      ca-certificates libgc1 libmbedtls14 rsync \
+      ca-certificates libgc1 libmbedtls21 rsync \
  && rm -rf /var/lib/apt/lists/*
 copy --from=build /usr/local/ /usr/local/
 copy --from=build /planet/ /planet/
