@@ -256,17 +256,116 @@
         (cdr doc)
         (list doc))))
 
+(define allowed-elements
+  '(a abbr acronym address article aside audio b big blockquote br
+    caption center cite code col colgroup dd del details dfn div dl dt
+    em figcaption figure footer h1 h2 h3 h4 h5 h6 header hr i img ins
+    kbd li main mark nav ol p picture pre q rp rt ruby s samp section
+    small source span strike strong sub summary sup table tbody td
+    tfoot th thead time tr track tt u ul var video wbr))
+
+(define drop-elements '(math noscript script style svg template))
+
+(define global-attributes '(class dir id lang role title))
+
+(define element-attributes
+  '((a		href hreflang name rel)
+    (audio	controls loop muted preload src)
+    (blockquote cite)
+    (col	span)
+    (colgroup	span)
+    (del	cite datetime)
+    (details	open)
+    (img	alt height loading sizes src srcset width)
+    (ins	cite datetime)
+    (li		value)
+    (ol		reversed start type)
+    (q		cite)
+    (source	media sizes src srcset type)
+    (table	border cellpadding cellspacing summary)
+    (td		align colspan headers rowspan scope valign)
+    (th		align colspan headers rowspan scope valign)
+    (time	datetime)
+    (track	default kind label src srclang)
+    (video	controls height loop muted poster preload src width)))
+
+(define uri-attributes '(action cite href poster src))
+
+(define (safe-uri? str)
+  (let ((s (string-trim str)))
+    (or (string-prefix? "http://" s)
+        (string-prefix? "https://" s)
+        (string-prefix? "mailto:" s)
+        (not (rxmatch #/^[a-zA-Z][a-zA-Z0-9+.-]*:/ s)))))
+
+(define (allowed-attribute? tag attr-name)
+  (and (not (string-prefix? "on" (symbol->string attr-name)))
+       (not (eq? attr-name 'style))
+       (or (memq attr-name global-attributes)
+           (let ((elem-attrs (assq tag element-attributes)))
+             (and elem-attrs (memq attr-name (cdr elem-attrs)))))))
+
+(define (filter-attributes tag attrs)
+  (filter (lambda (a)
+            (let ((name (car a)))
+              (and (allowed-attribute? tag name)
+                   (if (and (memq name uri-attributes)
+                            (pair? (cdr a)))
+                       (safe-uri? (cadr a))
+                       #true))))
+          attrs))
+
+(define (sanitize-sxml nodes)
+  (let loop ((nodes nodes) (accumulator '()))
+    (if (null? nodes)
+        (reverse accumulator)
+        (let ((node (car nodes)))
+          (cond ((string? node)
+		 (loop (cdr nodes) (cons node accumulator)))
+		((and (pair? node) (symbol? (car node))
+                      (not (eq? (car node) '@)))
+		 (let ((tag (car node)))
+		   (cond ((memq tag drop-elements)
+			  (loop (cdr nodes) accumulator))
+			 ((memq tag allowed-elements)
+			  (let* ((rest (cdr node))
+				 (has-attrs (and (pair? rest)
+						 (pair? (car rest))
+						 (eq? (caar rest) '@)))
+				 (attrs (if has-attrs (cdar rest) '()))
+				 (children (if has-attrs (cdr rest) rest))
+				 (filtered (filter-attributes tag attrs))
+				 (clean-children (sanitize-sxml children))
+				 (new-node (if (null? filtered)
+					       (cons tag clean-children)
+					       (cons tag
+						     (cons (cons '@ filtered)
+							   clean-children)))))
+			    (loop (cdr nodes) (cons new-node accumulator))))
+			 (else
+			  (let* ((rest (cdr node))
+				 (children (if (and (pair? rest)
+						    (pair? (car rest))
+						    (eq? (caar rest) '@))
+					       (cdr rest) rest)))
+			    (loop (cdr nodes)
+				  (append (reverse (sanitize-sxml children))
+					  accumulator)))))))
+		(else
+		 (loop (cdr nodes) (cons node accumulator))))))))
+
 (define (content-sxml node)
   (if (not node)
       '()
       (let ((children (filter (lambda (x)
                                 (not (and (pair? x) (eq? (car x) '@))))
                               (cdr node))))
-        (if (and (pair? children)
-                 (null? (cdr children))
-                 (string? (car children)))
-            (html-string->sxml (car children))
-            children))))
+        (sanitize-sxml
+         (if (and (pair? children)
+                  (null? (cdr children))
+                  (string? (car children)))
+             (html-string->sxml (car children))
+             children)))))
 
 (define (make-entry title link content author date-str channel-name channel-link
                     feed-url)
