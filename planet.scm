@@ -151,7 +151,9 @@
             (host+port (if port (format "~a:~a" host port) host))
             (path+query (if query (format "~a?~a" path query) path)))
         (let-values (((status headers body)
-                      (parameterize ((http-user-agent "Planet Scheme/1.0 (https://planet.scheme.org/)"))
+                      (parameterize
+			  ((http-user-agent
+			    "Planet Scheme/1.0 (https://planet.scheme.org/)"))
                         (http-get host+port path+query :secure secure))))
           (if (string-prefix? "2" status)
               body
@@ -166,12 +168,13 @@
              #false))
     (call-with-input-string string
       (lambda (port)
-        (ssax:xml->sxml port '((atom . "http://www.w3.org/2005/Atom")
-                               (content . "http://purl.org/rss/1.0/modules/content/")
-                               (dc . "http://purl.org/dc/elements/1.1/")
-                               (rdf . "http://www.w3.org/1999/02/22-rdf-syntax-ns#")
-                               (rss1 . "http://purl.org/rss/1.0/")
-                               (xhtml . "http://www.w3.org/1999/xhtml")))))))
+        (ssax:xml->sxml port
+		       '((atom . "http://www.w3.org/2005/Atom")
+                         (content . "http://purl.org/rss/1.0/modules/content/")
+                         (dc . "http://purl.org/dc/elements/1.1/")
+                         (rdf . "http://www.w3.org/1999/02/22-rdf-syntax-ns#")
+                         (rss1 . "http://purl.org/rss/1.0/")
+                         (xhtml . "http://www.w3.org/1999/xhtml")))))))
 
 (define (sxml-text node)
   (and node
@@ -557,7 +560,8 @@
                                                       a))
                                                 (or (sxml:attr-list node) '())))
                                   (filter (lambda (x)
-                                            (not (and (pair? x) (eq? (car x) '@))))
+                                            (not (and (pair? x)
+						      (eq? (car x) '@))))
                                           (cdr node))))
                       new-cache)
               (values #false new-cache)))
@@ -568,30 +572,31 @@
     (if (null? nodes)
         (values (reverse acc) cache)
         (let ((node (car nodes)))
-          (cond
-           ((string? node)
-            (loop (cdr nodes) cache (cons node acc)))
-           ((and (pair? node) (eq? (car node) 'img))
-            (let-values (((new-img new-cache)
-                          (cache-img-element node cache output-dir)))
-              (if new-img
-                  (loop (cdr nodes) new-cache (cons new-img acc))
-                  (loop (cdr nodes) new-cache acc))))
-           ((pair? node)
-            (let* ((tag (car node))
-                   (rest (cdr node))
-                   (attrs (if (and (pair? rest) (pair? (car rest))
-                                   (eq? (caar rest) '@))
-                              (car rest) #false))
-                   (children (if attrs (cdr rest) rest)))
-              (let-values (((new-children new-cache)
-                            (cache-images-in-sxml children cache output-dir)))
-                (let ((new-node (if attrs
-                                    (cons tag (cons attrs new-children))
-                                    (cons tag new-children))))
-                  (loop (cdr nodes) new-cache (cons new-node acc))))))
-           (else
-            (loop (cdr nodes) cache (cons node acc))))))))
+          (cond ((string? node)
+		 (loop (cdr nodes) cache (cons node acc)))
+		((and (pair? node) (eq? (car node) 'img))
+		 (let-values (((new-img new-cache)
+                               (cache-img-element node cache output-dir)))
+		   (if new-img
+                       (loop (cdr nodes) new-cache (cons new-img acc))
+                       (loop (cdr nodes) new-cache acc))))
+		((pair? node)
+		 (let* ((tag (car node))
+			(rest (cdr node))
+			(attrs (if (and (pair? rest) (pair? (car rest))
+					(eq? (caar rest) '@))
+				   (car rest) #false))
+			(children (if attrs (cdr rest) rest)))
+		   (let-values (((new-children new-cache)
+				 (cache-images-in-sxml children
+						       cache
+						       output-dir)))
+                     (let ((new-node (if attrs
+					 (cons tag (cons attrs new-children))
+					 (cons tag new-children))))
+                       (loop (cdr nodes) new-cache (cons new-node acc))))))
+		(else
+		 (loop (cdr nodes) cache (cons node acc))))))))
 
 (define (cache-all-images entries image-cache output-dir)
   (let loop ((entries entries) (cache image-cache) (accumulator '()))
@@ -667,7 +672,9 @@
            ,(string-append " Jens Axel S\u00f8gaard."))
         (p "To send feedback or to have your blog featured,"
            " please write the "
-           (a (@ (href "https://srfi.schemers.org/srfi-list-subscribe.html#schemeorg"))
+           (a (@
+	       (href
+		"https://srfi.schemers.org/srfi-list-subscribe.html#schemeorg"))
               (code "schemeorg") " mailing list")
            ".")
         (p (a (@ (href "https://github.com/schemeorg/planet.scheme.org"))
@@ -678,7 +685,8 @@
                             (url (feed-ref feed 'url))
                             (blog-link (assoc url channel-links))
                             (blog-url (if (and blog-link
-                                               (not (string=? (cdr blog-link) "")))
+                                               (not (string=? (cdr blog-link)
+							      "")))
                                           (cdr blog-link) url)))
                        `(li (a (@ (href ,blog-url)
                                   (title ,name))
@@ -735,7 +743,9 @@
          (feeds (config-feeds config))
          (now (current-date)))
     (let-values (((processed-entries final-cache)
-                  (cache-all-images entries (load-image-cache output-dir) output-dir)))
+                  (cache-all-images entries
+				    (load-image-cache output-dir)
+				    output-dir)))
       (let* ((day-groups
               (group-sequence processed-entries
                               :key (lambda (pair)
@@ -796,7 +806,8 @@
                      (content (@ (type "html"))
                               ,(string-concatenate
                                 (map sxml->html-string content)))
-                     (source (title ,(or (entry-ref entry 'channel-name) ""))))))
+                     (source
+		      (title ,(or (entry-ref entry 'channel-name) ""))))))
                entries)))))
 
 (define (generate-rss config entries output-dir)
